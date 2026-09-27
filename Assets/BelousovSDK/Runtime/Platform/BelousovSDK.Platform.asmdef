@@ -1,0 +1,18 @@
+{
+    "name": "BelousovSDK.Platform",
+    "rootNamespace": "",
+    "references": [
+        "GUID:63c3b2e2ec2046441bd88ea919f3b5f4"
+    ],
+    "includePlatforms": [
+        "WebGL"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
