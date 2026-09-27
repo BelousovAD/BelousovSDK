@@ -1,0 +1,16 @@
+{
+    "name": "BelousovSDK.Movement",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bdca04e78d96eab47933749214645538"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
