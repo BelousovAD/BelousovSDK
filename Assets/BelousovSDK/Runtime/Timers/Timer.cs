@@ -10,10 +10,11 @@ namespace BelousovSDK.Timers
         private const int Min = 0;
         private const int Second = 1;
         
-        private int _time;
-        private CancellationTokenSource _cancellationTokenSource;
+        private float _time;
+        private CancellationTokenSource _cancellationTokenSource = new ();
+        private UniTask _countdown = UniTask.CompletedTask;
 
-        public Timer(int max)
+        public void Initialize(int max)
         {
             if (max <= Min)
             {
@@ -26,10 +27,10 @@ namespace BelousovSDK.Timers
         public event Action Changed;
         
         public event Action Finished;
-        
-        public int Max { get; }
 
-        public int Time
+        public int Max { get; private set; } = 1;
+
+        public float Time
         {
             get => _time;
             
@@ -40,21 +41,43 @@ namespace BelousovSDK.Timers
             }
         }
 
+        public bool IsFinished => Mathf.Approximately(Time, Min);
+
+        public float Ratio => Time / Max;
+
+        public float Progress => 1f - Ratio;
+
         public void Dispose() =>
             Stop();
 
-        public void Start()
+        public void Add(float seconds)
         {
-            Stop();
-            Time = Max;
-            _cancellationTokenSource = new CancellationTokenSource();
-            Countdown(_cancellationTokenSource.Token).Forget();
+            switch (seconds)
+            {
+                case < Min:
+                    throw new ArgumentOutOfRangeException(nameof(seconds), "Must be positive");
+                case Min:
+                    return;
+            }
+
+            if (IsFinished && _countdown.Status == UniTaskStatus.Succeeded)
+            {
+                Time += seconds;
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = new CancellationTokenSource();
+                _countdown = Countdown(_cancellationTokenSource.Token);
+            }
+            else
+            {
+                Time += seconds;
+            }
         }
 
-        private void Stop()
+        public void Stop()
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
         }
 
         private async UniTask Countdown(CancellationToken token)
@@ -62,16 +85,23 @@ namespace BelousovSDK.Timers
             while (!token.IsCancellationRequested && Time > Min)
             {
                 if (await UniTask.Delay(TimeSpan.FromSeconds(Second), cancellationToken: token)
-                        .SuppressCancellationThrow() == false)
+                        .SuppressCancellationThrow())
                 {
-                    Time--;
+                    return;
                 }
+                
+                Time -= Second;
+            }
+
+            Time = Min;
+            _countdown = UniTask.CompletedTask;
+            
+            if (token.IsCancellationRequested)
+            {
+                return;
             }
             
-            if (!token.IsCancellationRequested)
-            {
-                Finished?.Invoke();
-            }
+            Finished?.Invoke();
         }
     }
 }

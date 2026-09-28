@@ -1,10 +1,8 @@
 {
-    "name": "BelousovSDK.Timers",
+    "name": "BelousovSDK.Movement",
     "rootNamespace": "",
     "references": [
-        "GUID:0ff9acc681fd1a3468996beb71d12d63",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:bdca04e78d96eab47933749214645538"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

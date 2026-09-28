@@ -4,13 +4,13 @@ namespace BelousovSDK.FiniteStateMachine
 {
     internal class Transition
     {
-        public Transition(IState to, IPredicate condition)
+        public Transition(State to, IPredicate condition)
         {
             To = to;
             Condition = condition;
         }
         
-        public IState To { get; }
+        public State To { get; }
         
         public IPredicate Condition { get; }
     }

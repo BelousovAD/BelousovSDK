@@ -5,33 +5,33 @@ using BelousovSDK.FiniteStateMachine.Predicates;
 
 namespace BelousovSDK.FiniteStateMachine
 {
-    internal class StateMachine
+    public class StateMachine
     {
         private readonly HashSet<Transition> _anyTransitions = new ();
-        private readonly Dictionary<Type, StateNode> _nodes = new ();
+        private readonly Dictionary<StateType, StateNode> _nodes = new ();
         private StateNode _current;
 
         public event Action StateChanged;
 
-        public IState Current => _current?.State;
+        public State Current => _current?.State;
 
-        public void Update(float deltaTime)
+        public void Update()
         {
             Transition transition = GetActivatedTransition();
 
             if (transition is not null)
             {
-                SwitchStateTo(transition.To.GetType());
+                SwitchStateTo(transition.To.Type);
             }
         }
 
-        public void AddAnyTransition(IState to, IPredicate condition) =>
+        public void AddAnyTransition(State to, IPredicate condition) =>
             _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
 
-        public void AddTransition(IState from, IState to, IPredicate condition) =>
+        public void AddTransition(State from, State to, IPredicate condition) =>
             GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
 
-        public void SetFirstState(Type type)
+        public void SetFirstState(StateType type)
         {
             if (_current is null)
             {
@@ -40,22 +40,22 @@ namespace BelousovSDK.FiniteStateMachine
             }
         }
 
-        private StateNode GetOrAddNode(IState state)
+        private StateNode GetOrAddNode(State state)
         {
-            StateNode node = _nodes.GetValueOrDefault(state.GetType());
+            StateNode node = _nodes.GetValueOrDefault(state.Type);
 
             if (node is null)
             {
                 node = new StateNode(state);
-                _nodes.Add(state.GetType(), node);
+                _nodes.Add(state.Type, node);
             }
 
             return node;
         }
 
-        private void SwitchStateTo(Type type)
+        private void SwitchStateTo(StateType type)
         {
-            if (_current.State.GetType() == type)
+            if (_current.State.Type == type)
             {
                 return;
             }
@@ -72,17 +72,17 @@ namespace BelousovSDK.FiniteStateMachine
 
         private class StateNode
         {
-            public StateNode(IState state)
+            public StateNode(State state)
             {
                 State = state;
                 Transitions = new HashSet<Transition>();
             }
             
-            public IState State { get; }
+            public State State { get; }
             
             public HashSet<Transition> Transitions { get; }
 
-            public void AddTransition(IState to, IPredicate predicate) =>
+            public void AddTransition(State to, IPredicate predicate) =>
                 Transitions.Add(new Transition(to, predicate));
         }
     }
