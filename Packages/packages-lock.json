@@ -163,7 +163,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.scriptablebuildpipeline": {
-      "version": "2.6.1",
+      "version": "2.6.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {

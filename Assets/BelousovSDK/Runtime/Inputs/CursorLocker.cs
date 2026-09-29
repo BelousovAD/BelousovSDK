@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Reflex.Attributes;
 using UnityEngine;
 
 namespace BelousovSDK.Inputs
@@ -10,53 +9,28 @@ namespace BelousovSDK.Inputs
         
         [SerializeField] private bool _lock;
 
-        private Input _input;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetOwners() =>
             s_lockers.Clear();
 
-        [Inject]
-        private void Initialize(Input input)
-        {
-            _input = input;
-            UpdateCursorState();
-        }
-
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             s_lockers.AddLast(this);
             UpdateCursorState();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             s_lockers.Remove(this);
             UpdateCursorState();
         }
 
-        private void UpdateCursorState()
+        protected virtual void UpdateCursorState()
         {
-            bool isLocked = s_lockers.Last.Value._lock;
+            bool isLocked = s_lockers.Last?.Value._lock ?? false;
             
             Cursor.lockState = isLocked ? CursorLockMode.Locked : CursorLockMode.Confined;
             Cursor.visible = !isLocked;
-            
-            if (_input == null)
-            {
-                return;
-            }
-
-            if (isLocked)
-            {
-                _input.Player.Look.Disable();
-                _input.Player.Attack.Disable();
-            }
-            else
-            {
-                _input.Player.Look.Enable();
-                _input.Player.Attack.Enable();
-            }
         }
     }
 }
