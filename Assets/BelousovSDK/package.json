@@ -1,6 +1,6 @@
 {
   "name": "com.belousov-gamedev.belousov-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Belousov SDK",
   "description": "This is Software Development Kit for apps making with Unity",
   "unity": "6000.3",
