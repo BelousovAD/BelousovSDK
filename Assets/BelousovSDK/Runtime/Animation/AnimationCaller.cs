@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using BelousovSDK.Animation.States;
 using BelousovSDK.FiniteStateMachine;
 using UnityEngine;
 using StateMachine = BelousovSDK.FiniteStateMachine.StateMachine;
@@ -7,12 +9,12 @@ namespace BelousovSDK.Animation
 {
     internal class AnimationCaller : MonoBehaviour
     {
-        private readonly Dictionary<StateType, AnimationKey> _keys = new ()
+        private readonly Dictionary<Type, AnimationKey> _keys = new ()
         {
-            [StateType.Idle] = AnimationKey.Idle,
-            [StateType.Attack] = AnimationKey.Attack,
-            [StateType.Jump] = AnimationKey.Jump,
-            [StateType.Run] = AnimationKey.Run,
+            [typeof(IIdleState)] = AnimationKey.Idle,
+            [typeof(IAttackState)] = AnimationKey.Attack,
+            [typeof(IJumpState)] = AnimationKey.Jump,
+            [typeof(IRunState)] = AnimationKey.Run,
         };
 
         [SerializeField] private StateMachineProvider _stateMachineProvider;
@@ -35,7 +37,7 @@ namespace BelousovSDK.Animation
         private void CallAnimation()
         {
             if (_stateMachine.Current is not null &&
-                _keys.TryGetValue(_stateMachine.Current.Type, out AnimationKey key))
+                _keys.TryGetValue(_stateMachine.Current.GetType(), out AnimationKey key))
             {
                 _animator.Play(key);
             }
