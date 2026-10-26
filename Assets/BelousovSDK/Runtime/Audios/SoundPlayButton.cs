@@ -12,7 +12,7 @@ namespace BelousovSDK.Audios
     {
         private const AudioType SoundType = AudioType.Sound;
 
-        [SerializeField] private AudioClipKey _clipKey;
+        [SerializeField] private AudioClipId _clipKey;
         [SerializeField] private float _delay;
 
         private Audio _audio;
@@ -22,6 +22,6 @@ namespace BelousovSDK.Audios
             _audio = audios.FirstOrDefault(audioObject => audioObject.Type == SoundType);
 
         protected override void HandleClick() =>
-            UniTask.Delay(TimeSpan.FromSeconds(_delay)).ContinueWith(() => _audio.Play(_clipKey)).Forget();
+            UniTask.Delay(TimeSpan.FromSeconds(_delay)).ContinueWith(() => _audio.Play(_clipKey.Value)).Forget();
     }
 }

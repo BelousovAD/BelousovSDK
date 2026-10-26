@@ -9,7 +9,7 @@ namespace BelousovSDK.Audios
     {
         private const AudioType SoundType = AudioType.Sound;
 
-        [SerializeField] private AudioClipKey _clipKey;
+        [SerializeField] private AudioClipId _clipKey;
         [SerializeField] private Moment _moment;
 
         private Audio _audio;
@@ -28,7 +28,7 @@ namespace BelousovSDK.Audios
         {
             if (_moment == Moment.OnEnable)
             {
-                _audio.Play(_clipKey);
+                _audio.Play(_clipKey.Value);
             }
         }
 
@@ -36,7 +36,7 @@ namespace BelousovSDK.Audios
         {
             if (_moment == Moment.OnDisable)
             {
-                _audio.Play(_clipKey);
+                _audio.Play(_clipKey.Value);
             }
         }
     }

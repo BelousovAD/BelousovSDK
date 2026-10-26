@@ -10,7 +10,7 @@ namespace BelousovSDK.Audios
     {
         private readonly AudioMixerGroup _group;
         private readonly AudioSourceSpawner _spawner;
-        private readonly Dictionary<AudioClipKey, AudioClip> _tracks = new ();
+        private readonly Dictionary<string, AudioClip> _tracks = new ();
         private SavvyServicesProvider _services;
         private bool _isActive = true;
         private float _volume = 1f;
@@ -80,7 +80,7 @@ namespace BelousovSDK.Audios
             Volume = Mathf.Clamp01(_services.Preferences.LoadFloat(Type + nameof(Volume), 0.5f));
         }
 
-        public void Play(AudioClipKey key)
+        public void Play(string key)
         {
             if (!_tracks.TryGetValue(key, out AudioClip clip))
             {
