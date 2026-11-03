@@ -1,25 +1,55 @@
+using System;
 using BelousovSDK.Spawn;
 
 namespace BelousovSDK.Audios
 {
-    public class AudioSourceSpawner : SiblingsSpawner
+    public class AudioSourceSpawner : SiblingsSpawner, IDisposable
     {
+        private bool _disposed;
+
         public void Prewarm(int count)
         {
             PooledAudioSource[] sources = new PooledAudioSource[count];
             
-            for (int i = 0; i < count; i++)
+            try
             {
-                sources[i] = Spawn();
+                for (int i = 0; i < count; i++)
+                {
+                    sources[i] = Spawn();
+                }
             }
-            
-            foreach (PooledAudioSource source in sources)
+            finally
             {
-                source.Release();
+                foreach (PooledAudioSource source in sources)
+                {
+                    if (source != null)
+                    {
+                        source.Release();
+                    }
+                }
             }
         }
 
-        public new PooledAudioSource Spawn() =>
-            base.Spawn().GetComponent<PooledAudioSource>();
+        public new PooledAudioSource Spawn() => _disposed
+            ? throw new ObjectDisposedException(nameof(AudioSourceSpawner))
+            : base.Spawn().GetComponent<PooledAudioSource>();
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            
+            _disposed = true;
+            
+            if (this == null)
+            {
+                return;
+            }
+            
+            Clear();
+            Destroy(gameObject);
+        }
     }
 }

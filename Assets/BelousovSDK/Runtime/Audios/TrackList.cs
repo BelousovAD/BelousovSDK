@@ -4,7 +4,7 @@ using UnityEngine;
 namespace BelousovSDK.Audios
 {
     [CreateAssetMenu(fileName = nameof(TrackList), menuName = nameof(Audios) + "/" + nameof(TrackList))]
-    internal class TrackList : ScriptableObject
+    public class TrackList : ScriptableObject
     {
         [SerializeField] private List<Track> _tracks = new ();
 

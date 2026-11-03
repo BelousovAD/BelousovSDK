@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BelousovSDK.Audios
 {
-    internal class AudioLoader : MonoBehaviour, ILoadable
+    public class AudioLoader : MonoBehaviour, ILoadable
     {
         private List<Audio> _audios;
 

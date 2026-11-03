@@ -8,7 +8,7 @@ namespace BelousovSDK.Audios
         [SerializeField] private AudioClipId _key;
         [SerializeField] private AudioClip _clip;
         
-        public string Key => _key.Value;
+        public string Key => _key != null ? _key.Value : string.Empty;
         
         public AudioClip Clip => _clip;
     }

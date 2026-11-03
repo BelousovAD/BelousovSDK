@@ -1,3 +1,4 @@
+using System;
 using BelousovSDK.Bootstrap;
 using Reflex.Core;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.Audio;
 
 namespace BelousovSDK.Audios
 {
-    internal class AudioInstaller : MonoBehaviour, IInstaller
+    public class AudioInstaller : MonoBehaviour, IInstaller
     {
         [SerializeField] private AudioMixer _audioMixer;
         [SerializeField] private AudioMixerGroup _musicGroup;
@@ -20,6 +21,11 @@ namespace BelousovSDK.Audios
 
         public void InstallBindings(ContainerBuilder builder)
         {
+            if (builder.HasBinding(typeof(Audio)) || builder.HasBinding(typeof(AudioSourceSpawner)))
+            {
+                throw new InvalidOperationException("Register audio only once in the root container.");
+            }
+            
             _builder = builder;
             GameObject spawnerObject = new (nameof(AudioSourceSpawner));
             AudioSourceSpawner spawner = spawnerObject.AddComponent<AudioSourceSpawner>();
@@ -29,6 +35,7 @@ namespace BelousovSDK.Audios
             _music = new Audio(AudioType.Music, _musicGroup, spawner, _musics.Tracks);
             _sound = new Audio(AudioType.Sound, _soundGroup, spawner, _sounds.Tracks);
 
+            _builder.RegisterValue(spawner);
             _builder.RegisterValue(_music);
             _builder.RegisterValue(_sound);
             _builder.RegisterValue(new AudioMixerController(_audioMixer, _music, _sound));
