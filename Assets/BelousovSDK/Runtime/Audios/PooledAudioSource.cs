@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using BelousovSDK.Spawn;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -10,39 +11,82 @@ namespace BelousovSDK.Audios
     public class PooledAudioSource : PooledComponent
     {
         private AudioSource _audioSource;
+        private AudioPlayback _playback;
 
         private void Awake() =>
             _audioSource = GetComponent<AudioSource>();
 
         public void Initialize(AudioMixerGroup group, AudioClip clip)
         {
+            if (_playback != null)
+            {
+                throw new InvalidOperationException("The source is already playing.");
+            }
+            
             _audioSource.outputAudioMixerGroup = group;
             _audioSource.clip = clip;
         }
 
-        public async void Play()
+        public void Play() =>
+            Play(default).Completion.Forget();
+
+        public AudioPlayback Play(AudioPlaybackOptions options, CancellationToken cancellationToken = default) =>
+            Play(options, cancellationToken, CancellationToken.None);
+
+        internal AudioPlayback Play(AudioPlaybackOptions options, CancellationToken cancellationToken,
+            CancellationToken ownerToken)
         {
-            try
+            if (_playback != null)
             {
-                _audioSource.Play();
-                await UniTask.WaitUntil(() => _audioSource.isPlaying);
+                throw new InvalidOperationException("The source is already playing.");
             }
-            catch (Exception e)
+            
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = options.Loop;
+            _audioSource.ignoreListenerPause = options.IgnoreListenerPause;
+            _audioSource.spatialBlend = 0f;
+            _audioSource.volume = 1f;
+            _audioSource.pitch = 1f;
+            AudioPlayback playback = new(this, _audioSource, cancellationToken, ownerToken);
+            _playback = playback;
+            playback.Start();
+            
+            return playback;
+        }
+
+        internal void FinishPlayback(AudioPlayback playback)
+        {
+            // An external Release/disable can allow reuse before the old task observes cancellation.
+            if (!ReferenceEquals(_playback, playback))
             {
-                Debug.LogException(e);
+                return;
             }
-            finally
-            {
-                Release();
-            }
+            
+            _playback = null;
+            ResetSource();
+            Release();
         }
 
         private void OnDisable()
         {
-            if (_audioSource != null)
+            AudioPlayback playback = _playback;
+            _playback = null;
+            playback?.Stop();
+            ResetSource();
+        }
+
+        private void ResetSource()
+        {
+            if (_audioSource == null)
             {
-                _audioSource.Stop();
+                return;
             }
+            
+            _audioSource.Stop();
+            _audioSource.clip = null;
+            _audioSource.outputAudioMixerGroup = null;
+            _audioSource.loop = false;
+            _audioSource.ignoreListenerPause = false;
         }
     }
 }

@@ -41,13 +41,13 @@ namespace BelousovSDK.Audios
 
         private void UpdateMusicVolume()
         {
-            float value = Mathf.Clamp(_music.Volume, MinValue, MaxValue);
+            float value = Mathf.Clamp(float.IsFinite(_music.Volume) ? _music.Volume : Audio.DefaultVolume, MinValue, MaxValue);
             _audioMixer.SetFloat(MusicVolume, _music.IsActive ? Mathf.Log(value, LogarithmBase) * Multiplier : -80f);
         }
 
         private void UpdateSoundVolume()
         {
-            float value = Mathf.Clamp(_sound.Volume, MinValue, MaxValue);
+            float value = Mathf.Clamp(float.IsFinite(_sound.Volume) ? _sound.Volume : Audio.DefaultVolume, MinValue, MaxValue);
             _audioMixer.SetFloat(SoundVolume, _sound.IsActive ? Mathf.Log(value, LogarithmBase) * Multiplier : -80f);
         }
     }

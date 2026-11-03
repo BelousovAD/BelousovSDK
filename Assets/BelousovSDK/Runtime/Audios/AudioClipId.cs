@@ -3,7 +3,7 @@ using UnityEngine;
 namespace BelousovSDK.Audios
 {
     [CreateAssetMenu(fileName = nameof(AudioClipId), menuName = nameof(Audios) + "/" + nameof(AudioClipId))]
-    internal class AudioClipId : ScriptableObject
+    public class AudioClipId : ScriptableObject
     {
         [SerializeField] private string _value;
 

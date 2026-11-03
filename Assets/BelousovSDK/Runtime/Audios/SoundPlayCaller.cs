@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Reflex.Attributes;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace BelousovSDK.Audios
 
         [SerializeField] private AudioClipId _clipKey;
         [SerializeField] private Moment _moment;
+        [SerializeField] private bool _ignoreListenerPause;
 
         private Audio _audio;
 
@@ -24,11 +26,23 @@ namespace BelousovSDK.Audios
         private void Initialize(IEnumerable<Audio> audios) =>
             _audio = audios.FirstOrDefault(audioObject => audioObject.Type == SoundType);
 
+        private void Play()
+        {
+            if (_audio == null || _clipKey == null || destroyCancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            
+            AudioPlayback playback = _audio.Play(_clipKey.Value,
+                new AudioPlaybackOptions(ignoreListenerPause: _ignoreListenerPause), destroyCancellationToken);
+            playback?.Completion.Forget();
+        }
+
         private void OnEnable()
         {
             if (_moment == Moment.OnEnable)
             {
-                _audio.Play(_clipKey.Value);
+                Play();
             }
         }
 
@@ -36,7 +50,7 @@ namespace BelousovSDK.Audios
         {
             if (_moment == Moment.OnDisable)
             {
-                _audio.Play(_clipKey.Value);
+                Play();
             }
         }
     }

@@ -13,13 +13,52 @@ namespace BelousovSDK.Audios
         private Audio _audio;
 
         [Inject]
-        private void Initialize(IEnumerable<Audio> audios) =>
-            _audio = audios.FirstOrDefault(audioObject => audioObject.Type == _type);
+        private void Initialize(IEnumerable<Audio> audios)
+        {
+            Unsubscribe();
+            _audio = audios.Single(audioObject => audioObject.Type == _type);
+            
+            if (isActiveAndEnabled)
+            {
+                Subscribe();
+            }
+        }
 
-        private void Awake() =>
-            Toggle.isOn = _audio.IsActive;
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            
+            if (_audio != null)
+            {
+                Subscribe();
+            }
+        }
+
+        protected override void OnDisable()
+        {
+            Unsubscribe();
+            base.OnDisable();
+        }
 
         protected override void HandleValue(bool value) =>
             _audio.SetActive(value);
+
+        private void Subscribe()
+        {
+            Unsubscribe();
+            _audio.ActivityChanged += UpdateValue;
+            UpdateValue();
+        }
+
+        private void Unsubscribe()
+        {
+            if (_audio != null)
+            {
+                _audio.ActivityChanged -= UpdateValue;
+            }
+        }
+
+        private void UpdateValue() =>
+            Toggle.SetIsOnWithoutNotify(_audio.IsActive);
     }
 }
